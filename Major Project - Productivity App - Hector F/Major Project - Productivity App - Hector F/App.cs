@@ -23,6 +23,11 @@ namespace Major_Project___Productivity_App___Hector_F
         {
             this.BackColor = Color.FromArgb(255, 37, 37, 50);
 
+            CreateMenu();
+        }
+
+        private void CreateMenu()
+        {
             menu = new FlowLayoutPanel();
             menu.Size = new Size(menuWidth, this.Height);
             menu.BackColor = Color.FromArgb(255, 61, 63, 82);
@@ -34,11 +39,23 @@ namespace Major_Project___Productivity_App___Hector_F
             menu.Visible = false;
             Controls.Add(menu);
 
-            Button homeButton = CreateMenuButton("HOME");
-            Button habitsButton = CreateMenuButton("HABITS");
-            Button tasksGoalsButton = CreateMenuButton("TASKS AND GOALS");
+            CreatePage("HOME");
+            CreatePage("HABITS");
+            CreatePage("TASKS AND GOALS");
+            CreatePage("FOCUS TIMER");
 
             menu.Visible = true;
+        }
+
+        private void CreatePage(string pageName)
+        {
+            Button pageButtonOnMenu = CreateMenuButton(pageName);
+            Panel pagePanel = new Panel();
+            pagePanel.Size = new Size(this.Width - menuWidth, this.Height);
+            pagePanel.BackColor = Color.FromArgb(255, 37, 37, 50);
+            pagePanel.Location = new Point(menuWidth, 0);
+            pagePanel.Visible = false;
+            Controls.Add(pagePanel);
         }
 
         private Button CreateMenuButton(string buttonName)
@@ -52,20 +69,20 @@ namespace Major_Project___Productivity_App___Hector_F
             menuButton.Margin = new Padding(0, 0, 0, 0);
             menuButton.ForeColor = Color.White;
             menuButton.Text = buttonName;
-            menuButton.MouseEnter += new EventHandler(OnMouseEnterButton);
-            menuButton.MouseLeave += new EventHandler(OnMouseExitButton);
+            menuButton.MouseEnter += new EventHandler(menuButton_OnMouseEnterButton);
+            menuButton.MouseLeave += new EventHandler(menuButton_OnMouseExitButton);
 
             menu.Controls.Add(menuButton);
 
             return menuButton;
         }
 
-        private void OnMouseEnterButton(object sender, EventArgs e)
+        private void menuButton_OnMouseEnterButton(object sender, EventArgs e)
         {
             Button button = (Button)sender;
             button.BackColor = Color.FromArgb(50, 189, 189, 208);
         }
-        private void OnMouseExitButton(object sender, EventArgs e)
+        private void menuButton_OnMouseExitButton(object sender, EventArgs e)
         {
             Button button = (Button)sender;
             button.BackColor = Color.FromArgb(255, 61, 63, 82);

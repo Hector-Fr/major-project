@@ -34,6 +34,7 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.FromArgb(37, 37, 50);
             ClientSize = new Size(1191, 635);
             Name = "App";
             Text = "Form1";
