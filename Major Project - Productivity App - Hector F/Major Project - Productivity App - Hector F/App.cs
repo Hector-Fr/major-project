@@ -1,9 +1,12 @@
+using System.Windows.Forms;
+
 namespace Major_Project___Productivity_App___Hector_F
 {
     public partial class App : Form
     {
+        Page[] pages;
         FlowLayoutPanel menu;
-        int menuWidth = 240;
+        public static int menuWidth = 240;
         int buttonHeight = 80;
 
         public App()
@@ -36,26 +39,30 @@ namespace Major_Project___Productivity_App___Hector_F
             menu.ClientSize = menu.Size;
             menu.Margin = new Padding(0, 0, 0, 0);
             menu.Location = new Point(0, 0);
-            menu.Visible = false;
             Controls.Add(menu);
 
-            CreatePage("HOME");
-            CreatePage("HABITS");
-            CreatePage("TASKS AND GOALS");
-            CreatePage("FOCUS TIMER");
+            pages = new Page[] { CreatePage("HOME"), 
+                                 CreatePage("HABITS"), 
+                                 CreatePage("TASKS"), 
+                                 CreatePage("FOCUS TIMER"), 
+                                 CreatePage("GOALS") };
 
             menu.Visible = true;
         }
 
-        private void CreatePage(string pageName)
+        private Page CreatePage(string pageName)
         {
-            Button pageButtonOnMenu = CreateMenuButton(pageName);
-            Panel pagePanel = new Panel();
-            pagePanel.Size = new Size(this.Width - menuWidth, this.Height);
-            pagePanel.BackColor = Color.FromArgb(255, 37, 37, 50);
-            pagePanel.Location = new Point(menuWidth, 0);
-            pagePanel.Visible = false;
-            Controls.Add(pagePanel);
+            Page page = new Page(pageName);
+
+            page.panel.Size = new Size(this.Width - menuWidth, this.Height);
+            page.panel.BackColor = Color.FromArgb(255, 37, 37, 50);
+            page.panel.Location = new Point(menuWidth, 0);
+            Controls.Add(page.panel);
+
+            page.menuButton = CreateMenuButton(pageName);
+            page.menuButton.Click += (sender, e) => menuButton_OnMouseClick(sender, e, page);
+
+            return page;
         }
 
         private Button CreateMenuButton(string buttonName)
@@ -71,10 +78,20 @@ namespace Major_Project___Productivity_App___Hector_F
             menuButton.Text = buttonName;
             menuButton.MouseEnter += new EventHandler(menuButton_OnMouseEnterButton);
             menuButton.MouseLeave += new EventHandler(menuButton_OnMouseExitButton);
-
+         
             menu.Controls.Add(menuButton);
 
             return menuButton;
+        }
+
+        private void menuButton_OnMouseClick(object sender, EventArgs e, Page page)
+        {
+            foreach (Page _page in pages)
+            {
+                _page.Show(false);
+            }
+
+            page.Show(true);
         }
 
         private void menuButton_OnMouseEnterButton(object sender, EventArgs e)
