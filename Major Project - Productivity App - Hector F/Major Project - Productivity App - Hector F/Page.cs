@@ -1,29 +1,29 @@
-﻿
-using System.Transactions;
-using System.Windows.Forms;
+﻿using System;
 
 namespace Major_Project___Productivity_App___Hector_F
 {
-    internal class Page
+    public class Page
     {
+        public Form app;
+
         public string name;
-        public Button menuButton;
         public Panel panel;
-        bool isVisible = false;
+        public Button btnMenuButton;
+        public bool visible;
 
         public Page(string _name)
         {
+            app = Form.
             name = _name;
-            menuButton = new Button();
             panel = new Panel();
-            isVisible = false;
-            panel.Visible = false;
+            btnMenuButton = new Button();
+            visible = false;
         }
 
         public void Show(bool enable)
         {
-            isVisible = enable;
-            panel.Visible = isVisible;
+            visible = enable;
+            panel.Visible = visible;
         }
     }
 }
