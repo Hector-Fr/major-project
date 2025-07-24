@@ -4,10 +4,8 @@ namespace Major_Project___Productivity_App___Hector_F
 {
     public partial class App : Form
     {
-        public static int width, height;
-        Page[] pages;
         FlowLayoutPanel menu;
-        public static int menuWidth = 240;
+        int menuWidth = 240;
         int buttonHeight = 80;
 
         public App()
@@ -26,10 +24,13 @@ namespace Major_Project___Productivity_App___Hector_F
         private void Initialise()
         {
             this.BackColor = Color.FromArgb(255, 37, 37, 50);
-            width = this.Width;
-            height = this.Height;
 
             CreateMenu();
+
+            Page homePage = CreateHomePage();
+            Button btnMenuButton = CreateMenuButton("HOME");
+            btnMenuButton.Click += new EventHandler(btnMenuButton_OnMouseClick, homePage);
+            homePage.menuButton = btnMenuButton;
         }
 
         private void CreateMenu()
@@ -44,29 +45,9 @@ namespace Major_Project___Productivity_App___Hector_F
             menu.Location = new Point(0, 0);
             Controls.Add(menu);
 
-            pages = new Page[] { CreatePage("HOME", Color.Red), 
-                                 CreatePage("HABITS", Color.Orange), 
-                                 CreatePage("TASKS", Color.Yellow), 
-                                 CreatePage("FOCUS TIMER", Color.Green), 
-                                 CreatePage("GOALS", Color.Blue) };
-
             menu.Visible = true;
         }
 
-        private Page CreatePage(string pageName, Color color)
-        {
-            Page page = new Page(pageName);
-
-            page.panel.Size = new Size(this.Width - menuWidth, this.Height);
-            page.panel.BackColor = color;//Color.FromArgb(255, 37, 37, 50);
-            page.panel.Location = new Point(menuWidth, 0);
-            Controls.Add(page.panel);
-
-            page.btnMenuButton = CreateMenuButton(pageName);
-            page.btnMenuButton.Click += (sender, e) => menuButton_OnMouseClick(sender, e, page);
-
-            return page;
-        }
 
         private Button CreateMenuButton(string buttonName)
         {
@@ -79,33 +60,65 @@ namespace Major_Project___Productivity_App___Hector_F
             btnMenuButton.Margin = new Padding(0, 0, 0, 0);
             btnMenuButton.ForeColor = Color.White;
             btnMenuButton.Text = buttonName;
-            btnMenuButton.MouseEnter += new EventHandler(menuButton_OnMouseEnterButton);
-            btnMenuButton.MouseLeave += new EventHandler(menuButton_OnMouseExitButton);
+            btnMenuButton.MouseEnter += new EventHandler(btnMenuButton_OnMouseEnterButton);
+            btnMenuButton.MouseLeave += new EventHandler(btnMenuButton_OnMouseExitButton);
+            
          
             menu.Controls.Add(btnMenuButton);
 
             return btnMenuButton;
         }
 
-        private void menuButton_OnMouseClick(object sender, EventArgs e, Page page)
+        private void btnMenuButton_OnMouseClick(object sender, EventArgs e, Page page)
         {
-            foreach (Page _page in pages)
-            {
-                _page.Show(false);
-            }
+            Button btnMenuButton = (Button)sender;
 
-            page.Show(true);
+            btnMenuButton.Visible = true;
         }
 
-        private void menuButton_OnMouseEnterButton(object sender, EventArgs e)
+        private void btnMenuButton_OnMouseEnterButton(object sender, EventArgs e)
         {
             Button button = (Button)sender;
             button.BackColor = Color.FromArgb(50, 189, 189, 208);
         }
-        private void menuButton_OnMouseExitButton(object sender, EventArgs e)
+        private void btnMenuButton_OnMouseExitButton(object sender, EventArgs e)
         {
             Button button = (Button)sender;
             button.BackColor = Color.FromArgb(255, 61, 63, 82);
+        }
+
+
+        private Page CreateHomePage()
+        {
+            Page homePage = new Page();
+            homePage.pagePanel.BackColor = Color.FromArgb(255, 37, 37, 255);
+            homePage.pagePanel.Size = new Size(this.Width - menuWidth, this.Height);
+            homePage.pagePanel.Location = new Point(menuWidth, 0);
+            Controls.Add(homePage.pagePanel);
+
+            Label txtbxWelcome = new Label();
+            txtbxWelcome.Text = "Welcome. Time to crush your productivity goals.";
+            txtbxWelcome.AutoSize = true;
+            txtbxWelcome.Location = new Point((this.Width - menuWidth) / 2 - txtbxWelcome.Width / 2, this.Height / 2 - txtbxWelcome.Height / 2);
+            Controls.Add(txtbxWelcome);
+            txtbxWelcome.Parent = homePage.pagePanel;
+
+            homePage.pagePanel.Visible = false;
+
+            return homePage;
+        }
+
+        private Page CreateHabitsPage()
+        {
+            Page habitsPage = new Page();
+            habitsPage.pagePanel.BackColor = Color.FromArgb(255, 37, 37, 50);
+            habitsPage.pagePanel.Size = new Size(this.Width - menuWidth, this.Height);
+            habitsPage.pagePanel.Location = new Point(menuWidth, 0);
+            Controls.Add(habitsPage.pagePanel);
+
+            habitsPage.pagePanel.Visible = false;
+
+            return habitsPage;
         }
     }
 }
