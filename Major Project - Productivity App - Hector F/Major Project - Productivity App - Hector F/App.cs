@@ -5,9 +5,14 @@ namespace Major_Project___Productivity_App___Hector_F
 {
     public partial class App : Form
     {
+        Page activePage;
         FlowLayoutPanel menu;
         public int menuWidth = 240;
         int buttonHeight = 80;
+
+        public Color pageColour = Color.FromArgb(255, 40, 47, 62);
+        Color menuColour = Color.FromArgb(255, 34, 40, 53);
+        Color buttonColour = Color.FromArgb(255, 60, 70, 91);
 
         Page[] pages;
 
@@ -26,28 +31,46 @@ namespace Major_Project___Productivity_App___Hector_F
         /// </summary>
         private void Initialise()
         {
-            this.BackColor = Color.FromArgb(255, 37, 37, 50);
+            this.BackColor = pageColour;
 
             CreateMenu();
 
-            HomePage homePage = new HomePage(this);
+            CreatePages();
+        }
+
+        private void CreatePages()
+        {
+            HomePage homePage = new HomePage(this, "HOME");
             Button btnMenuHome = CreateMenuButton("HOME");
             btnMenuHome.Click += new EventHandler((sender, e) => btnMenuButton_OnMouseClick(sender, e, homePage));
             homePage.menuButton = btnMenuHome;
 
-            Page habitsPage = new HabitsPage(this);
+            HabitsPage habitsPage = new HabitsPage(this, "HABITS");
             Button btnMenuHabits = CreateMenuButton("HABITS");
             btnMenuHabits.Click += new EventHandler((sender, e) => btnMenuButton_OnMouseClick(sender, e, habitsPage));
             habitsPage.menuButton = btnMenuHabits;
 
             pages = new Page[] { homePage, habitsPage };
+
+            SwitchToPage(pages[0]);
+        }
+        
+        private void SwitchToPage (Page page)
+        {
+            foreach (Page _page in pages)
+            {
+                _page.pagePanel.Visible = false;
+            }
+
+            page.pagePanel.Visible = true;
+            activePage = page;
         }
 
         private void CreateMenu()
         {
             menu = new FlowLayoutPanel();
             menu.Size = new Size(menuWidth, this.Height);
-            menu.BackColor = Color.FromArgb(255, 61, 63, 82);
+            menu.BackColor = menuColour;
             menu.FlowDirection = FlowDirection.TopDown;
             menu.BorderStyle = BorderStyle.None;
             menu.ClientSize = menu.Size;
@@ -63,7 +86,7 @@ namespace Major_Project___Productivity_App___Hector_F
         {
             Button btnMenuButton = new Button();
             btnMenuButton.Size = new Size(menuWidth, buttonHeight);
-            btnMenuButton.BackColor = Color.FromArgb(255, 61, 63, 82);
+            btnMenuButton.BackColor = buttonColour;
             btnMenuButton.FlatStyle = FlatStyle.Flat;
             btnMenuButton.FlatAppearance.BorderColor = Color.FromArgb(255, 43, 45, 60);
             btnMenuButton.FlatAppearance.BorderSize = 3;
@@ -83,13 +106,7 @@ namespace Major_Project___Productivity_App___Hector_F
         {
             Button btnMenuButton = (Button)sender;
 
-            foreach (Page _page in pages)
-            {
-                _page.pagePanel.Visible = false;
-            }
-
-            page.pagePanel.Visible = true;
-            
+            SwitchToPage(page);
         }
 
         private void btnMenuButton_OnMouseEnterButton(object sender, EventArgs e)
@@ -100,7 +117,7 @@ namespace Major_Project___Productivity_App___Hector_F
         private void btnMenuButton_OnMouseExitButton(object sender, EventArgs e)
         {
             Button button = (Button)sender;
-            button.BackColor = Color.FromArgb(255, 61, 63, 82);
+            button.BackColor = buttonColour;
         }
 
     }

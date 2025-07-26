@@ -5,20 +5,11 @@ namespace Major_Project___Productivity_App___Hector_F
 {
     class HomePage : Page
     {
-        public HomePage(App mainForm) : base(mainForm) { }
+        public HomePage(App mainForm, string pageName) : base(mainForm, pageName) { }
 
-        public override void Create()
+        public override void Create(string pageName)
         {
-            base.Create();
-
-            pagePanel.BackColor = Color.Red;
-
-            Label txtbxWelcome = new Label();
-            txtbxWelcome.Text = "Welcome. Time to crush your productivity goals.";
-            txtbxWelcome.AutoSize = true;
-            txtbxWelcome.Location = new Point((mainForm.Width - mainForm.menuWidth) / 2 - txtbxWelcome.Width / 2, mainForm.Height / 2 - txtbxWelcome.Height / 2);
-            mainForm.Controls.Add(txtbxWelcome);
-            txtbxWelcome.Parent = this.pagePanel;
+            base.Create(pageName);
         }
     }
 }
