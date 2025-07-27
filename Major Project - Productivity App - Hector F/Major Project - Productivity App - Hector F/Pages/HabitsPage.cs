@@ -1,11 +1,9 @@
-﻿using System;
-using System.Windows.Forms;
-
+﻿
 namespace Major_Project___Productivity_App___Hector_F
 {
-    class HomePage : Page
+    class HabitsPage : Page
     {
-        public HomePage(App mainForm, string pageName) : base(mainForm, pageName) { }
+        public HabitsPage(App mainForm, string pageName, Button menuButton) : base(mainForm, pageName, menuButton) { }
 
         public override void Create(string pageName)
         {
