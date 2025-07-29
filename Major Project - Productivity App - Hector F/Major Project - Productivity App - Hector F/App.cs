@@ -14,8 +14,8 @@ namespace Major_Project___Productivity_App___Hector_F
 
         // Colours
         public Color pageColour = Color.FromArgb(255, 40, 47, 62);
-        Color menuColour = Color.FromArgb(255, 34, 40, 53);
-        Color buttonColour = Color.FromArgb(255, 60, 70, 91);        
+        public Color menuColour = Color.FromArgb(255, 34, 40, 53);
+        public Color buttonColour = Color.FromArgb(255, 60, 70, 91);        
 
         public App()
         {
@@ -34,6 +34,7 @@ namespace Major_Project___Productivity_App___Hector_F
         private void Initialise()
         {
             this.BackColor = pageColour;
+            this.Size = new Size(1700, 1000);
 
             CreateMenu();
 
