@@ -15,7 +15,7 @@ namespace Major_Project___Productivity_App___Hector_F
         // Colours
         public Color pageColour = Color.FromArgb(255, 40, 47, 62);
         public Color menuColour = Color.FromArgb(255, 34, 40, 53);
-        public Color buttonColour = Color.FromArgb(255, 60, 70, 91);        
+        public Color buttonColour = Color.FromArgb(255, 60, 70, 91);
 
         public App()
         {
@@ -34,7 +34,8 @@ namespace Major_Project___Productivity_App___Hector_F
         private void Initialise()
         {
             this.BackColor = pageColour;
-            this.Size = new Size(1700, 1000);
+            this.Size = new Size(1200, 800);
+            this.Font = new Font("Comic Sans MS", 12);
 
             CreateMenu();
 
@@ -76,12 +77,12 @@ namespace Major_Project___Productivity_App___Hector_F
             // When the app opens, the default page is the home page
             SwitchToPage(pages[0]);
         }
-        
+
         /// <summary>
         /// When called, this method ensures all other pages are disabled, then the desired page is enabled
         /// </summary>
         /// <param name="page"></param>
-        private void SwitchToPage (Page page)
+        private void SwitchToPage(Page page)
         {
             // Loop through all the pages in the array and disable them
             foreach (Page _page in pages)
@@ -131,7 +132,7 @@ namespace Major_Project___Productivity_App___Hector_F
             // Change the colour of the button if the mouse hovers over it
             btnMenuButton.MouseEnter += new EventHandler(btnMenuButton_OnMouseEnterButton);
             btnMenuButton.MouseLeave += new EventHandler(btnMenuButton_OnMouseExitButton);
-         
+
             // Add the button to the menu sidebar (append onto the flow layout panel)
             menu.Controls.Add(btnMenuButton);
 
@@ -158,5 +159,6 @@ namespace Major_Project___Productivity_App___Hector_F
             button.BackColor = buttonColour;
         }
 
+        //private void checkBox1_CheckedChanged(object sender, EventArgs e) { }
     }
 }

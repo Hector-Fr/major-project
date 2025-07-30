@@ -31,7 +31,7 @@ namespace Major_Project___Productivity_App___Hector_F
             txtbx.Text = "This is the " + pageName + " page.";
             txtbx.AutoSize = true;
             txtbx.ForeColor = Color.White;
-            txtbx.Location = new Point((mainForm.Width - mainForm.menuWidth) / 2 - txtbx.Width / 2, mainForm.Height / 2 - txtbx.Height / 2);
+            txtbx.Location = new Point((mainForm.Width - mainForm.menuWidth) / 2 - txtbx.Width / 2, mainForm.Height - 100);
             mainForm.Controls.Add(txtbx);
             // IMPORTANT - every control in the page must be a child of the page panel, so that when the page panel is disabled, so will the controls
             txtbx.Parent = pagePanel;
