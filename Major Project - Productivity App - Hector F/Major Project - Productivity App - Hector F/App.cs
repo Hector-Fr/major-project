@@ -35,7 +35,7 @@ namespace Major_Project___Productivity_App___Hector_F
         {
             this.BackColor = pageColour;
             this.Size = new Size(1200, 800);
-            this.Font = new Font("Comic Sans MS", 12);
+            this.Font = new Font("Comic Sans MS", 10);
 
             CreateMenu();
 
@@ -71,8 +71,13 @@ namespace Major_Project___Productivity_App___Hector_F
             GoalsPage goalsPage = new GoalsPage(this, "GOALS", btnMenuGoals);
             btnMenuGoals.Click += new EventHandler((sender, e) => btnMenuButton_OnMouseClick(sender, e, goalsPage));
 
+            Button btnQuan = CreateMenuButton("MOTIVATION THEORY");
+            Quan quan = new Quan(this, "MOTIVATION THEORY", btnQuan);
+            btnQuan.Click += new EventHandler((sender, e) => btnMenuButton_OnMouseClick(sender, e, quan));
+            quan.ShowQuan();
+
             // Store all the pages in an array
-            pages = new Page[] { homePage, habitsPage, tasksPage, focusPage, goalsPage };
+            pages = new Page[] { homePage, habitsPage, tasksPage, focusPage, goalsPage, quan };
 
             // When the app opens, the default page is the home page
             SwitchToPage(pages[0]);
@@ -161,4 +166,15 @@ namespace Major_Project___Productivity_App___Hector_F
 
         //private void checkBox1_CheckedChanged(object sender, EventArgs e) { }
     }
+
+    public class EmptyControl
+    {
+        public Control control;
+
+        public EmptyControl()
+        {
+            control = new Control();
+        }
+    }
+
 }
