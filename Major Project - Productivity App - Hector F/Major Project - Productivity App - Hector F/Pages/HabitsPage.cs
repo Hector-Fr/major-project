@@ -5,15 +5,18 @@ namespace Major_Project___Productivity_App___Hector_F
 {
     class HabitsPage : Page
     {
+        string[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+
         // The max number of days of habits that the habit grid (rows) should show at one time
         int numOfDaysToShow = 5;
         // The number of habits there are (columns). The user can add more
-        int numOfHabits = 5;
+        int numOfHabits = 0;
 
         TableLayoutPanel habitsGrid;
         int yAdjust = 20;
         Size habitsGridSize = new Size(1000, 600);
         Button btnAddHabit;
+        TextBox txtbxEnterHabitName;
 
         public HabitsPage(App mainForm, string pageName, Button menuButton) : base(mainForm, pageName, menuButton) { }
 
@@ -60,19 +63,59 @@ namespace Major_Project___Productivity_App___Hector_F
                         }
                         else
                         {
-                            if (y != 1)
+                            Label dayLabel = new Label();
+                            DateTime dateOfHabitRow = DateTime.Now.AddDays(2 - y);
+                            string ordinal = "";
+
+                            if (y <= 3)
                             {
-                                // Add the day column (today, yesterday, day before, etc.)
-                                Label dayLabel = new Label();
-                                dayLabel.Text = "Day " + (y - 1).ToString();
-                                dayLabel.AutoSize = true;
-                                dayLabel.TextAlign = ContentAlignment.BottomCenter;
-                                dayLabel.ForeColor = Color.White;
-                                habitsGrid.Controls.Add(dayLabel, 0, y);
+                                switch (y)
+                                {
+                                    case 1:
+                                        break;
+                                    case 2:
+                                        dayLabel.Text = "Today";
+                                        break;
+                                    case 3:
+                                        dayLabel.Text = "Yesterday";
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                switch (dateOfHabitRow.Day % 10)
+                                {
+                                    case 1:
+                                        if ((dateOfHabitRow.Day / 10) % 10 != 1)
+                                            ordinal = "st";
+                                        break;
+                                    case 2:
+                                        if ((dateOfHabitRow.Day / 10) % 10 != 1)
+                                            ordinal = "nd";
+                                        break;
+                                    case 3:
+                                        if ((dateOfHabitRow.Day / 10) % 10 != 1)
+                                            ordinal = "rd";
+                                        break;
+                                    default:
+                                        ordinal = "th";
+                                        break;
+                                }
+
+                                string month = months[dateOfHabitRow.Month - 1];
+
+                                dayLabel.Text = dateOfHabitRow.Day.ToString() + ordinal + " " + month;
                             }
                             
+                            
+                            dayLabel.AutoSize = true;
+                            dayLabel.TextAlign = ContentAlignment.BottomCenter;
+                            dayLabel.ForeColor = Color.White;
+                            habitsGrid.Controls.Add(dayLabel, 0, y);
                         }
                     }
+
+ 
                     // In the first row
                     else if (y == 0)
                     {
@@ -101,18 +144,36 @@ namespace Major_Project___Productivity_App___Hector_F
 
             btnAddHabit = new Button();
             btnAddHabit.BackgroundImage = Image.FromFile("C:\\Progamming Projects\\School\\Major Project\\major-project\\Major Project - Productivity App - Hector F\\Major Project - Productivity App - Hector F\\Resources\\Icons\\Add Icon.png");
-            btnAddHabit.Size = new Size(35, 35);
+            btnAddHabit.Size = new Size(30, 30);
             btnAddHabit.BackgroundImageLayout = ImageLayout.Stretch;
             btnAddHabit.Click += new EventHandler(btnAddHabit_Click);
+            btnAddHabit.FlatStyle = FlatStyle.Flat;
+            btnAddHabit.FlatAppearance.BorderSize = 0;
             habitsGrid.Controls.Add(btnAddHabit, habitsGrid.ColumnCount, 0);
+
+            txtbxEnterHabitName = new TextBox();
+            txtbxEnterHabitName.Size = new Size(180, txtbxEnterHabitName.Size.Height);
+            txtbxEnterHabitName.Visible = false;
+            txtbxEnterHabitName.KeyDown += new KeyEventHandler(txtbxEnterHabitName_KeyDown);
+            txtbxEnterHabitName.GotFocus += new EventHandler(txtbxEnterHabitName_EnterFocus);
+            txtbxEnterHabitName.LostFocus += new EventHandler(txtbxEnterHabitName_ExitFocus);
+            pagePanel.Controls.Add(txtbxEnterHabitName);
         }
 
-        private void AddNewHabit()
+        private void ShowHabitNamingBox()
         {
             // Show the new habit box - for naming, icon, etc.
+            txtbxEnterHabitName.Location = new Point(btnAddHabit.Location.X + 10, btnAddHabit.Location.Y + 60);
+            txtbxEnterHabitName.ForeColor = Color.Gray;
+            txtbxEnterHabitName.Text = "Enter habit name...";
+            txtbxEnterHabitName.Visible = true;
+
+            // Show the textbox until the keydown event is called (enter key is pressed) and direct to habit creation method
+        }
 
 
-
+        private void AddNewHabit(string habitName)
+        {
             // Add new column for habit
             habitsGrid.ColumnCount += 1;
 
@@ -122,7 +183,7 @@ namespace Major_Project___Productivity_App___Hector_F
 
             // Create the new habit header at row 0 of the missing, new column
             Label newHabit = new Label();
-            newHabit.Text = "New habit";
+            newHabit.Text = habitName;
             newHabit.ForeColor = Color.White;
             newHabit.AutoSize = true;
             habitsGrid.Controls.Add(newHabit, habitsGrid.ColumnCount - 1, 0);
@@ -136,9 +197,9 @@ namespace Major_Project___Productivity_App___Hector_F
                 CreateCheckbox(habitsGrid.ColumnCount - 1, y);
             }
         }
-
         private void CreateCheckbox (int x, int y)
         {
+            // Create the checkbox
             CheckBox habitCheckbox = new CheckBox();
             habitCheckbox.AutoSize = false;
             habitCheckbox.Size = new Size(40, 40);
@@ -150,31 +211,61 @@ namespace Major_Project___Productivity_App___Hector_F
 
         private void CreateDeleteButton (int x, int y)
         {
+            // Create the delete button
             Button btnDeleteHabit = new Button();
             btnDeleteHabit.BackgroundImage = Image.FromFile("C:\\Progamming Projects\\School\\Major Project\\major-project\\Major Project - Productivity App - Hector F\\Major Project - Productivity App - Hector F\\Resources\\Icons\\Delete Icon.png");
             btnDeleteHabit.BackgroundImageLayout = ImageLayout.Stretch;
-            btnDeleteHabit.Size = new Size(35, 35);
+            btnDeleteHabit.Size = new Size(30, 30);
             btnDeleteHabit.Anchor = AnchorStyles.None;
+            btnDeleteHabit.FlatStyle = FlatStyle.Flat;
+            btnDeleteHabit.FlatAppearance.BorderSize = 0;
             btnDeleteHabit.Click += new EventHandler(btnDeleteHabit_Click);
-
+            // Add it to the grid at the position (x, y)
             habitsGrid.Controls.Add(btnDeleteHabit, x, y);
         }
 
         private void btnAddHabit_Click (object sender, EventArgs e)
         {
-            AddNewHabit();
+            ShowHabitNamingBox();
         }
         private void btnDeleteHabit_Click (object sender, EventArgs e)
         {
             // Get button that called the event
             Button btnDeleteHabit = (Button)sender;
 
-            // Remove the column (habit)
+            // Get the column that the delete button is associated with
             TableLayoutPanelCellPosition cellInColumnToDelete = habitsGrid.GetPositionFromControl(btnDeleteHabit);
-            for (int y = 0; y < habitsGrid.ColumnCount; y++)
+            for (int y = 0; y < habitsGrid.RowCount; y++)
             {
+                // Loop through all the items in the column and remove the control
                 habitsGrid.Controls.Remove(habitsGrid.GetControlFromPosition(cellInColumnToDelete.Column, y));
             }
+        }
+    
+        private void txtbxEnterHabitName_KeyDown (object sender, KeyEventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+
+            if (e.KeyCode == Keys.Return)
+            {
+                AddNewHabit(textBox.Text);
+                textBox.Text = "";
+                textBox.Visible = false;
+            }
+        }
+
+        private void txtbxEnterHabitName_EnterFocus (object sender, EventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            textBox.Text = "";
+            textBox.ForeColor = Color.Black;
+        }
+        private void txtbxEnterHabitName_ExitFocus (object sender, EventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            textBox.Text = "";
+            textBox.Visible = false;
+
         }
     }
 }
