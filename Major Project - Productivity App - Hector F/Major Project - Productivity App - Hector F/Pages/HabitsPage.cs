@@ -1,11 +1,11 @@
-﻿
-using System.Resources;
+﻿using System.IO;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Major_Project___Productivity_App___Hector_F
 {
     class HabitsPage : Page
     {
-        string[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+        string[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
 
         // The max number of days of habits that the habit grid (rows) should show at one time
         int numOfDaysToShow = 5;
@@ -17,6 +17,8 @@ namespace Major_Project___Productivity_App___Hector_F
         Size habitsGridSize = new Size(1000, 600);
         Button btnAddHabit;
         TextBox txtbxEnterHabitName;
+        Label lblEnterHabitName;
+        string habitStatesFilePath = "C:\\Progamming Projects\\School\\Major Project\\major-project\\Major Project - Productivity App - Hector F\\Major Project - Productivity App - Hector F\\bin\\Debug\\HabitStates.txt";
 
         public HabitsPage(App mainForm, string pageName, Button menuButton) : base(mainForm, pageName, menuButton) { }
 
@@ -24,24 +26,94 @@ namespace Major_Project___Productivity_App___Hector_F
         {
             base.Create(pageName);
 
-            CreateHabitsGrid();
+            mainForm.FormClosing += new FormClosingEventHandler(MainForm_FormClosing);
 
-            
+            bool[,] habitData = LoadHabitDataFromFile();
+            CreateHabitsGrid(habitData);
         }
 
-        private void CreateHabitsGrid()
+        private bool[,] LoadHabitDataFromFile()
+        {
+            int rows = 0, columns = 0;
+
+            if (string.IsNullOrWhiteSpace(File.ReadAllText(habitStatesFilePath)))
+            {
+                return null;
+            }
+            using (StreamReader reader = new StreamReader(habitStatesFilePath))
+            {
+                while (!reader.EndOfStream)
+                {
+                    string[] items = reader.ReadLine().Split(' ');
+                    columns = items.Length;
+                    rows++;
+                }
+            }
+
+            bool[,] habitData = new bool[rows, columns];
+
+            using (StreamReader reader = new StreamReader(habitStatesFilePath))
+            {
+                int rowIndex = 0;
+
+                while (!reader.EndOfStream)
+                {
+                    string[] rawRow = reader.ReadLine().Split(' ');
+
+                    for (int x = 0; x < rawRow.Length; x++)
+                    {
+                        habitData[rowIndex, x] = bool.Parse(rawRow[x]);
+                    }
+
+                    rowIndex++;
+                }
+            }
+
+            return habitData;
+        }
+
+        private void CreateHabitsGrid(bool[,] habitData)
         {
             // The habits grid is a table including the rows for the days, the columns for the habits, including checkboxes, buttons, text, etc. in the grid as well
             habitsGrid = new TableLayoutPanel();
             habitsGrid.RowCount = numOfDaysToShow + 2;
-            habitsGrid.ColumnCount = numOfHabits + 2;
+
+            string text = "";
+            for (int y = 0; y < habitData.GetLength(0); y++)
+            {
+                for (int x = 0; x < habitData.GetLength(1); x++)
+                {
+                    text += habitData[y, x].ToString();
+                }
+
+                text += "\n";
+            }
+           
+            MessageBox.Show(text);
+
+            if (habitData != null)
+            {
+                try
+                {
+                    habitsGrid.ColumnCount = habitData.GetLength(1) + 2;
+                }
+                catch
+                {
+                    habitsGrid.ColumnCount = 3;
+                }
+            }
+            else
+            {
+                habitsGrid.ColumnCount = 2;
+            }
+
             habitsGrid.BackColor = mainForm.buttonColour;//mainForm.pageColour;
             habitsGrid.Size = habitsGridSize;
             habitsGrid.Location = new Point(pagePanel.Width / 2 - habitsGrid.Width / 2, pagePanel.Height / 2 - habitsGrid.Height / 2 - yAdjust);
             habitsGrid.AutoScroll = true;
             habitsGrid.GrowStyle = TableLayoutPanelGrowStyle.AddColumns;
             pagePanel.Controls.Add(habitsGrid);
-            
+
             for (int y = 0; y < habitsGrid.RowCount; y++)
             {
                 for (int x = 0; x < habitsGrid.ColumnCount - 1; x++)
@@ -106,8 +178,8 @@ namespace Major_Project___Productivity_App___Hector_F
 
                                 dayLabel.Text = dateOfHabitRow.Day.ToString() + ordinal + " " + month;
                             }
-                            
-                            
+
+
                             dayLabel.AutoSize = true;
                             dayLabel.TextAlign = ContentAlignment.BottomCenter;
                             dayLabel.ForeColor = Color.White;
@@ -115,7 +187,7 @@ namespace Major_Project___Productivity_App___Hector_F
                         }
                     }
 
- 
+
                     // In the first row
                     else if (y == 0)
                     {
@@ -134,14 +206,29 @@ namespace Major_Project___Productivity_App___Hector_F
                         }
                         else
                         {
-                            // If the cell is not a header, it's a checkbox
-                            CreateCheckbox(x, y);
+                            // If there is no data in the file
+                            if (habitData == null)
+                            {
+                                // Just create the checkboxes
+                                CreateCheckbox(x, y, false);
+                            }
+                            // If there was data in the file
+                            else
+                            {
+                                if (habitData.GetLength(0) != 0 && habitData.GetLength(1) != 0)
+                                {
+                                    // Load data from file into this checkbox
+                                    CreateCheckbox(x, y, habitData[y - 2, x - 1]);
+                                }
+                                
+                            }
                         }
-                        
-                    }        
-                }            
-            }
+                    }
 
+                }
+            }
+        
+    
             btnAddHabit = new Button();
             btnAddHabit.BackgroundImage = Image.FromFile("C:\\Progamming Projects\\School\\Major Project\\major-project\\Major Project - Productivity App - Hector F\\Major Project - Productivity App - Hector F\\Resources\\Icons\\Add Icon.png");
             btnAddHabit.Size = new Size(30, 30);
@@ -150,27 +237,39 @@ namespace Major_Project___Productivity_App___Hector_F
             btnAddHabit.FlatStyle = FlatStyle.Flat;
             btnAddHabit.FlatAppearance.BorderSize = 0;
             habitsGrid.Controls.Add(btnAddHabit, habitsGrid.ColumnCount, 0);
+            new ToolTip().SetToolTip(btnAddHabit, "Add a new habit");
 
             txtbxEnterHabitName = new TextBox();
             txtbxEnterHabitName.Size = new Size(180, txtbxEnterHabitName.Size.Height);
             txtbxEnterHabitName.Visible = false;
             txtbxEnterHabitName.KeyDown += new KeyEventHandler(txtbxEnterHabitName_KeyDown);
-            txtbxEnterHabitName.GotFocus += new EventHandler(txtbxEnterHabitName_EnterFocus);
             txtbxEnterHabitName.LostFocus += new EventHandler(txtbxEnterHabitName_ExitFocus);
             pagePanel.Controls.Add(txtbxEnterHabitName);
+
+            lblEnterHabitName = new Label();
+            lblEnterHabitName.Text = "Enter habit name";
+            lblEnterHabitName.ForeColor = Color.White;
+            lblEnterHabitName.AutoSize = true;
+            lblEnterHabitName.Location = new Point(txtbxEnterHabitName.Location.X + 130, txtbxEnterHabitName.Location.Y + 30);
+            lblEnterHabitName.Visible = false;
+            pagePanel.Controls.Add(lblEnterHabitName);
+
+            DateTime midnight = DateTime.Today.AddDays(1).AddSeconds(-1);
         }
 
         private void ShowHabitNamingBox()
         {
             // Show the new habit box - for naming, icon, etc.
             txtbxEnterHabitName.Location = new Point(btnAddHabit.Location.X + 10, btnAddHabit.Location.Y + 60);
-            txtbxEnterHabitName.ForeColor = Color.Gray;
-            txtbxEnterHabitName.Text = "Enter habit name...";
             txtbxEnterHabitName.Visible = true;
+            txtbxEnterHabitName.Focus();
+
+            lblEnterHabitName.Visible = true;
+            lblEnterHabitName.Location = new Point(txtbxEnterHabitName.Location.X, txtbxEnterHabitName.Location.Y - 30);
+
 
             // Show the textbox until the keydown event is called (enter key is pressed) and direct to habit creation method
         }
-
 
         private void AddNewHabit(string habitName)
         {
@@ -194,10 +293,21 @@ namespace Major_Project___Productivity_App___Hector_F
             // Create the column of checkboxes for this next habit
             for (int y = 2; y <= habitsGrid.RowCount - 1; y++)
             {
-                CreateCheckbox(habitsGrid.ColumnCount - 1, y);
+                CreateCheckbox(habitsGrid.ColumnCount - 1, y, false);
             }
         }
-        private void CreateCheckbox (int x, int y)
+
+        private void AddNewDay()
+        {
+            habitsGrid.RowCount++;
+
+            /*for (int x = 0; x < habitsGrid.ColumnCount; x++)
+            {
+                CreateCheckbox(x, 1);
+            } */
+        }
+
+        private void CreateCheckbox (int x, int y, bool _checked)
         {
             // Create the checkbox
             CheckBox habitCheckbox = new CheckBox();
@@ -206,6 +316,7 @@ namespace Major_Project___Productivity_App___Hector_F
             habitCheckbox.Anchor = AnchorStyles.Top;
             habitCheckbox.CheckAlign = ContentAlignment.TopCenter;
             habitCheckbox.Padding = new Padding(0, 0, 0, 0);
+            habitCheckbox.Checked = _checked;
             habitsGrid.Controls.Add(habitCheckbox, x, y);
         }
 
@@ -222,6 +333,8 @@ namespace Major_Project___Productivity_App___Hector_F
             btnDeleteHabit.Click += new EventHandler(btnDeleteHabit_Click);
             // Add it to the grid at the position (x, y)
             habitsGrid.Controls.Add(btnDeleteHabit, x, y);
+
+            new ToolTip().SetToolTip(btnDeleteHabit, "Delete Habit");
         }
 
         private void btnAddHabit_Click (object sender, EventArgs e)
@@ -240,32 +353,81 @@ namespace Major_Project___Productivity_App___Hector_F
                 // Loop through all the items in the column and remove the control
                 habitsGrid.Controls.Remove(habitsGrid.GetControlFromPosition(cellInColumnToDelete.Column, y));
             }
+            habitsGrid.ColumnCount--;
         }
     
         private void txtbxEnterHabitName_KeyDown (object sender, KeyEventArgs e)
         {
             TextBox textBox = (TextBox)sender;
 
-            if (e.KeyCode == Keys.Return)
+            if (e.KeyCode == Keys.Return && textBox.Text != "")
             {
                 AddNewHabit(textBox.Text);
                 textBox.Text = "";
                 textBox.Visible = false;
+                lblEnterHabitName.Visible = false;
             }
         }
 
-        private void txtbxEnterHabitName_EnterFocus (object sender, EventArgs e)
-        {
-            TextBox textBox = (TextBox)sender;
-            textBox.Text = "";
-            textBox.ForeColor = Color.Black;
-        }
         private void txtbxEnterHabitName_ExitFocus (object sender, EventArgs e)
         {
             TextBox textBox = (TextBox)sender;
             textBox.Text = "";
             textBox.Visible = false;
-
+            lblEnterHabitName.Visible = false;
         }
+
+        /// <summary>
+        /// This event method runs just before the form closes. Includes saving/writing to file functions
+        /// </summary>
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        { 
+            // Save habits grid checkbox layout in a 2D array of bools representing: true = checkbox ticked, false = not ticked
+            bool[,] checkboxGridState = new bool[habitsGrid.RowCount - 2, habitsGrid.ColumnCount - 2];
+
+            for (int y = 0; y < checkboxGridState.GetLength(0); y++)
+            {
+                for (int x = 0; x < checkboxGridState.GetLength(1); x++)
+                {
+                    Control control = habitsGrid.GetControlFromPosition(x + 1, y + 2);
+
+                    if (control != null)
+                    {
+                        checkboxGridState[y, x] = (control as CheckBox).Checked;
+                    }
+                }
+            }
+
+
+            // Write to the file, a 2D grid of bools as the habits states
+            // e.g    true true false
+            //        false true true
+            // Open file to write to it
+            using (StreamWriter writer = new StreamWriter(habitStatesFilePath, false))
+            {
+                // Loop through checkboxGridState 2D bool array
+                for (int y = 0; y < checkboxGridState.GetLength(0); y++)
+                {
+                    for (int x = 0; x < checkboxGridState.GetLength(1); x++)
+                    {
+                        // Separate the states by a space, unless it is the last column (don't add a space after)
+                        if (x == checkboxGridState.GetLength(1) - 1)
+                        {
+                            writer.Write(checkboxGridState[y, x]);
+                        }
+                        else
+                        {
+                            writer.Write(checkboxGridState[y, x] + " ");
+                        }
+                    }
+
+                    if (y != checkboxGridState.GetLength(0) - 1 && checkboxGridState.GetLength(1) != 0)
+                    {
+                        // Add a new line
+                        writer.Write("\n");
+                    }
+                }
+            }
+        }    
     }
 }
