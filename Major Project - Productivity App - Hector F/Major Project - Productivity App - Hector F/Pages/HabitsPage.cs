@@ -236,11 +236,8 @@ namespace Major_Project___Productivity_App___Hector_F
             btnAddHabit.Click += new EventHandler(btnAddHabit_Click);
             btnAddHabit.FlatStyle = FlatStyle.Flat;
             btnAddHabit.FlatAppearance.BorderSize = 0;
-            habitsGrid.Controls.Add(btnAddHabit, habitsGrid.ColumnCount - 1, 0);
+            habitsGrid.Controls.Add(btnAddHabit, habitsGrid.ColumnCount, 0);
             new ToolTip().SetToolTip(btnAddHabit, "Add a new habit");
-
-            CreateProgressBars();
-
 
             // Create the text box to enter the name of the habit
             txtbxEnterHabitName = new TextBox();
@@ -260,21 +257,6 @@ namespace Major_Project___Productivity_App___Hector_F
             pagePanel.Controls.Add(lblEnterHabitName);
         }
 
-        private void CreateProgressBars()
-        {
-            habitsGrid.ColumnCount++;
-
-            for (int y = 2; y < habitsGrid.RowCount; y++)
-            {
-                ProgressBar pbrHabit = new ProgressBar();
-                pbrHabit.Minimum = 0;
-                pbrHabit.Maximum = 100;
-                pbrHabit.Value = 50;
-                pbrHabit.Location = new Point(btnAddHabit.Location.X + 150, habitsGrid.GetControlFromPosition(0, y).Location.Y);
-                habitsGrid.Controls.Add(pbrHabit, habitsGrid.ColumnCount, y);
-            }
-        }
-
         private void AddNewDay()
         {
             habitsGrid.RowCount++;
@@ -289,34 +271,24 @@ namespace Major_Project___Productivity_App___Hector_F
             // Add new column for habit
             habitsGrid.ColumnCount += 1;
 
-            // Move the progress bars along one column
-            for (int y = 2; y < habitsGrid.RowCount; y++)
-            {
-                Control progressBar = habitsGrid.GetControlFromPosition(habitsGrid.ColumnCount - 2, y);
-                MessageBox.Show(habitsGrid.ColumnCount - 1 + ", " + y + " " + (progressBar != null));
-                
-                habitsGrid.Controls.Remove(progressBar);
-                habitsGrid.Controls.Add(progressBar, habitsGrid.ColumnCount - 1, y);
-            }
-
             // Move the add button to this last, newly added column, leaving a column for the new habit
             habitsGrid.Controls.Remove(btnAddHabit);
-            habitsGrid.Controls.Add(btnAddHabit, habitsGrid.ColumnCount - 1, 0);
+            habitsGrid.Controls.Add(btnAddHabit, habitsGrid.ColumnCount, 0);
 
             // Create the new habit header at row 0 of the missing, new column
             Label newHabit = new Label();
             newHabit.Text = habitName;
             newHabit.ForeColor = Color.White;
             newHabit.AutoSize = true;
-            habitsGrid.Controls.Add(newHabit, habitsGrid.ColumnCount - 2, 0);
+            habitsGrid.Controls.Add(newHabit, habitsGrid.ColumnCount - 1, 0);
 
             // Create new button for deletion of new habit
-            CreateDeleteButton(habitsGrid.ColumnCount - 2, 1);
+            CreateDeleteButton(habitsGrid.ColumnCount - 1, 1);
 
             // Create the column of checkboxes for this next habit
             for (int y = 2; y <= habitsGrid.RowCount - 1; y++)
             {
-                CreateCheckbox(habitsGrid.ColumnCount - 2, y, false);
+                CreateCheckbox(habitsGrid.ColumnCount - 1, y, false);
             }
         }
 
@@ -370,7 +342,7 @@ namespace Major_Project___Productivity_App___Hector_F
         private void SaveHabitData()
         {
             // Save habits grid checkbox layout in a 2D array of bools representing: true = checkbox ticked, false = not ticked
-            bool[,] checkboxGridState = new bool[habitsGrid.RowCount - 2, habitsGrid.ColumnCount - 3];
+            bool[,] checkboxGridState = new bool[habitsGrid.RowCount - 2, habitsGrid.ColumnCount - 2];
 
             for (int y = 0; y < checkboxGridState.GetLength(0); y++)
             {
@@ -453,7 +425,6 @@ namespace Major_Project___Productivity_App___Hector_F
                 // Loop through all the items in the column and remove the control
                 habitsGrid.Controls.Remove(habitsGrid.GetControlFromPosition(cellInColumnToDelete.Column, y));
             }
-
             habitsGrid.ColumnCount--;
         }
     
