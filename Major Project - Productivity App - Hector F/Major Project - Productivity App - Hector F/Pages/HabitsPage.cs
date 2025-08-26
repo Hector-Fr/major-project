@@ -268,11 +268,47 @@ namespace Major_Project___Productivity_App___Hector_F
         }
         private void AddNewHabit(string habitName)
         {
+            int habitCount = habitsGrid.ColumnCount - 2;
+            int dayCount = habitsGrid.RowCount - 2;
+
+            List<string> habitNames = new List<string>();
+            for (int x = 1; x <= habitCount; x++)
+            {
+                Label lblHabit = habitsGrid.GetControlFromPosition(x, 0) as Label;
+                if (lblHabit != null)
+                {
+                    habitNames.Add(lblHabit.Text);
+                }
+            }
+
+            habitNames.Add(habitName);
+
+            bool[,] habitStates = new bool[dayCount, habitNames.Count];
+
+            for (int y = 0; y < dayCount; y++)
+            {
+                for (int x = 1; x <= habitCount; x++)
+                {
+                    CheckBox chbx = habitsGrid.GetControlFromPosition(x, y + 2) as CheckBox;
+                    if (chbx != null) habitStates[y, x - 1] = chbx.Checked;
+                }
+
+                habitStates[y, habitNames.Count - 1] = false;
+            }
+
+            habitsGrid.Controls.Clear();
+            CreateHabitsGrid(habitNames.ToArray(), habitStates);
+
+            RepositionAddButton();
+
+
+            /*
+            // Move the add button to this last, newly added column, leaving a column for the new habit
+            habitsGrid.Controls.Remove(btnAddHabit);
+
             // Add new column for habit
             habitsGrid.ColumnCount += 1;
 
-            // Move the add button to this last, newly added column, leaving a column for the new habit
-            habitsGrid.Controls.Remove(btnAddHabit);
             habitsGrid.Controls.Add(btnAddHabit, habitsGrid.ColumnCount, 0);
 
             // Create the new habit header at row 0 of the missing, new column
@@ -286,10 +322,12 @@ namespace Major_Project___Productivity_App___Hector_F
             CreateDeleteButton(habitsGrid.ColumnCount - 1, 1);
 
             // Create the column of checkboxes for this next habit
-            for (int y = 2; y <= habitsGrid.RowCount - 1; y++)
+            for (int y = 2; y < habitsGrid.RowCount; y++)
             {
                 CreateCheckbox(habitsGrid.ColumnCount - 1, y, false);
             }
+
+            MessageBox.Show(habitsGrid.ColumnCount.ToString()); */
         }
 
         /// <summary>
@@ -406,7 +444,6 @@ namespace Major_Project___Productivity_App___Hector_F
             }
         }
 
-
         // -------------- EVENTS -------------------------
         #region Events
         private void btnAddHabit_Click (object sender, EventArgs e)
@@ -417,15 +454,58 @@ namespace Major_Project___Productivity_App___Hector_F
         {
             // Get button that called the event
             Button btnDeleteHabit = (Button)sender;
-
             // Get the column that the delete button is associated with
             TableLayoutPanelCellPosition cellInColumnToDelete = habitsGrid.GetPositionFromControl(btnDeleteHabit);
+            int columnToDelete = cellInColumnToDelete.Column;
+
+            int habitCount = habitsGrid.ColumnCount - 2;
+            int dayCount = habitsGrid.RowCount - 2;
+
+            List<string> habitNames = new List<string>();
+            for (int x = 1; x <= habitCount; x++)
+            {
+                if (x != columnToDelete)
+                {
+                    Label lblHabit = habitsGrid.GetControlFromPosition(x, 0) as Label;
+                    if (lblHabit != null)
+                    {
+                        habitNames.Add(lblHabit.Text);
+                    }
+                }
+            }
+
+            bool[,] habitStates = new bool[dayCount, habitNames.Count];
+
             for (int y = 0; y < habitsGrid.RowCount; y++)
             {
+                int newColumn = 0;
+                for (int x = 1; x <= habitCount; x++)
+                {
+                    if (x == columnToDelete) continue;
+
+                    CheckBox chBx = habitsGrid.GetControlFromPosition(x, y + 2) as CheckBox;
+
+                    if (chBx != null) habitStates[y, newColumn] = chBx.Checked;
+                    newColumn++;
+                }
+
+                habitsGrid.Controls.Clear();
+
+                CreateHabitsGrid(habitNames.ToArray(), habitStates);
+
+                RepositionAddButton();
+
                 // Loop through all the items in the column and remove the control
                 habitsGrid.Controls.Remove(habitsGrid.GetControlFromPosition(cellInColumnToDelete.Column, y));
             }
+            
             habitsGrid.ColumnCount--;
+        }
+
+        private void RepositionAddButton() 
+        {
+            habitsGrid.Controls.Remove(btnAddHabit);
+            habitsGrid.Controls.Add(btnAddHabit, habitsGrid.ColumnCount - 1, 0);
         }
     
         // Runs when a key is pressed and the text box is in focus
