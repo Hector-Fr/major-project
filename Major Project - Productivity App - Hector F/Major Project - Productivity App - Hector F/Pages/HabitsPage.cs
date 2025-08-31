@@ -1,4 +1,6 @@
 ﻿
+using System.Windows.Forms;
+
 namespace Major_Project___Productivity_App___Hector_F
 {
     class HabitsPage : Page
@@ -9,6 +11,8 @@ namespace Major_Project___Productivity_App___Hector_F
 
         // The max number of days of habits that the habit grid (rows) should show at one time
         int numOfDaysToShow = 5;
+        int numOfNonHabitColumns = 2;
+        int numOfNonDayRows = 2;
 
         // Habit Grid
         TableLayoutPanel habitsGrid;
@@ -106,18 +110,18 @@ namespace Major_Project___Productivity_App___Hector_F
         {
             // Create the grid - set # of rows and columns
             habitsGrid = new TableLayoutPanel();
-            habitsGrid.RowCount = numOfDaysToShow + 2;
+            habitsGrid.RowCount = numOfDaysToShow + numOfNonDayRows;
 
             // If there was data in the file
             if (habitData != null)
             {
                 // Add two extra columns to the habits grid - one for the days, and one for the plus button (empty column)
-                habitsGrid.ColumnCount = habitData.GetLength(1) + 2;
+                habitsGrid.ColumnCount = habitData.GetLength(1) + numOfNonHabitColumns;
             }
             else
             {
                 // If there was not data in the file, there will be no habits, but there are just the two required columns of the grid
-                habitsGrid.ColumnCount = 2;
+                habitsGrid.ColumnCount = numOfNonHabitColumns;
             }
 
             // Initialise other aspects of the grid
@@ -220,11 +224,9 @@ namespace Major_Project___Productivity_App___Hector_F
                                     // Load data from file into this checkbox - checkboxes already checked
                                     CreateCheckbox(x, y, habitData[y - 2, x - 1]);
                                 }
-                                
                             }
                         }
                     }
-
                 }
             }
         
@@ -286,10 +288,12 @@ namespace Major_Project___Productivity_App___Hector_F
             CreateDeleteButton(habitsGrid.ColumnCount - 1, 1);
 
             // Create the column of checkboxes for this next habit
-            for (int y = 2; y <= habitsGrid.RowCount - 1; y++)
+            for (int y = 2; y < habitsGrid.RowCount; y++)
             {
                 CreateCheckbox(habitsGrid.ColumnCount - 1, y, false);
             }
+
+            
         }
 
         /// <summary>
@@ -320,7 +324,6 @@ namespace Major_Project___Productivity_App___Hector_F
             habitCheckbox.Checked = _checked;
             habitsGrid.Controls.Add(habitCheckbox, x, y);
         }
-
         private void CreateDeleteButton (int x, int y)
         {
             // Create the delete button
@@ -348,11 +351,19 @@ namespace Major_Project___Productivity_App___Hector_F
             {
                 for (int x = 0; x < checkboxGridState.GetLength(1); x++)
                 {
-                    Control control = habitsGrid.GetControlFromPosition(x + 1, y + 2);
+                    int gridX = x + 1;
+                    int gridY = y + 1;
 
-                    if (control != null)
+                    CheckBox checkbox = habitsGrid.GetControlFromPosition(gridX, gridY) as CheckBox;
+
+                    if (checkbox != null)
                     {
-                        checkboxGridState[y, x] = (control as CheckBox).Checked;
+                        checkboxGridState[y, x] = checkbox.Checked;
+                        //MessageBox.Show(checkboxGridState[y, x] + " at " + x + ", " + y);
+                    }
+                    else
+                    {
+                        //MessageBox.Show("Checkbox null at column " + x + ", row " + y);
                     }
                 }
             }
@@ -360,14 +371,14 @@ namespace Major_Project___Productivity_App___Hector_F
             string habitNameLine = "";
 
             // Loop through the columns in the top row
-            for (int column = 0; column < habitsGrid.ColumnCount - 1; column++)
+            for (int column = 0; column < checkboxGridState.GetLength(1); column++)
             {
                 // Get the string name from the grid
                 Label habitName = habitsGrid.GetControlFromPosition(column + 1, 0) as Label;
 
                 if (habitName != null)
                 {
-                    if (column != habitsGrid.ColumnCount - 2)
+                    if (column != checkboxGridState.GetLength(1) - 1)
                         habitNameLine += habitName.Text + "/";
                     else
                         habitNameLine += habitName.Text;
@@ -418,16 +429,18 @@ namespace Major_Project___Productivity_App___Hector_F
             // Get button that called the event
             Button btnDeleteHabit = (Button)sender;
 
-            // Get the column that the delete button is associated with
+            // Remove the column (habit)
             TableLayoutPanelCellPosition cellInColumnToDelete = habitsGrid.GetPositionFromControl(btnDeleteHabit);
             for (int y = 0; y < habitsGrid.RowCount; y++)
             {
-                // Loop through all the items in the column and remove the control
                 habitsGrid.Controls.Remove(habitsGrid.GetControlFromPosition(cellInColumnToDelete.Column, y));
             }
+
+
+
             habitsGrid.ColumnCount--;
         }
-    
+        
         // Runs when a key is pressed and the text box is in focus
         private void txtbxEnterHabitName_KeyDown (object sender, KeyEventArgs e)
         {
