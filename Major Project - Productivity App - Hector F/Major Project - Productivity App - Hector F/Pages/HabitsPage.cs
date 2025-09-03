@@ -292,8 +292,6 @@ namespace Major_Project___Productivity_App___Hector_F
             {
                 CreateCheckbox(habitsGrid.ColumnCount - 1, y, false);
             }
-
-            
         }
 
         /// <summary>
@@ -350,20 +348,12 @@ namespace Major_Project___Productivity_App___Hector_F
             for (int y = 0; y < checkboxGridState.GetLength(0); y++)
             {
                 for (int x = 0; x < checkboxGridState.GetLength(1); x++)
-                {
-                    int gridX = x + 1;
-                    int gridY = y + 1;
-
-                    CheckBox checkbox = habitsGrid.GetControlFromPosition(gridX, gridY) as CheckBox;
+                { 
+                    CheckBox checkbox = habitsGrid.GetControlFromPosition(x + 1, y + 2) as CheckBox;
 
                     if (checkbox != null)
                     {
                         checkboxGridState[y, x] = checkbox.Checked;
-                        //MessageBox.Show(checkboxGridState[y, x] + " at " + x + ", " + y);
-                    }
-                    else
-                    {
-                        //MessageBox.Show("Checkbox null at column " + x + ", row " + y);
                     }
                 }
             }
@@ -371,14 +361,14 @@ namespace Major_Project___Productivity_App___Hector_F
             string habitNameLine = "";
 
             // Loop through the columns in the top row
-            for (int column = 0; column < checkboxGridState.GetLength(1); column++)
+            for (int column = 1; column < habitsGrid.ColumnCount - 1; column++)
             {
                 // Get the string name from the grid
-                Label habitName = habitsGrid.GetControlFromPosition(column + 1, 0) as Label;
-
+                Label habitName = habitsGrid.GetControlFromPosition(column, 0) as Label;
+                
                 if (habitName != null)
                 {
-                    if (column != checkboxGridState.GetLength(1) - 1)
+                    if (column != habitsGrid.ColumnCount - 2)
                         habitNameLine += habitName.Text + "/";
                     else
                         habitNameLine += habitName.Text;
@@ -435,8 +425,6 @@ namespace Major_Project___Productivity_App___Hector_F
             {
                 habitsGrid.Controls.Remove(habitsGrid.GetControlFromPosition(cellInColumnToDelete.Column, y));
             }
-
-
 
             habitsGrid.ColumnCount--;
         }
