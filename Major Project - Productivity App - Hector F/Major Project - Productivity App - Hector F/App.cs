@@ -1,4 +1,6 @@
 
+using Major_Project___Productivity_App___Hector_F.Pages;
+
 namespace Major_Project___Productivity_App___Hector_F
 {
     public partial class App : Form
@@ -59,13 +61,10 @@ namespace Major_Project___Productivity_App___Hector_F
             HabitsPage habitsPage = new HabitsPage(this, "HABITS", btnMenuHabits);
             btnMenuHabits.Click += new EventHandler((sender, e) => btnMenuButton_OnMouseClick(sender, e, habitsPage));
 
-            Button btnMenuTasks = CreateMenuButton("TASKS");
-            TasksPage tasksPage = new TasksPage(this, "TASKS", btnMenuTasks);
-            btnMenuTasks.Click += new EventHandler((sender, e) => btnMenuButton_OnMouseClick(sender, e, tasksPage));
-
-            Button btnMenuFocus = CreateMenuButton("FOCUS");
-            FocusPage focusPage = new FocusPage(this, "FOCUS", btnMenuFocus);
-            btnMenuFocus.Click += new EventHandler((sender, e) => btnMenuButton_OnMouseClick(sender, e, focusPage));
+            Button btnMenuProgress = CreateMenuButton("PROGRESS");
+            ProgressPage progressPage = new ProgressPage(this, "PROGRESS", btnMenuProgress);
+            btnMenuProgress.Click += new EventHandler((sender, e) => btnMenuButton_OnMouseClick(sender, e, progressPage));
+            progressPage.habitsPage = habitsPage;
 
             Button btnMenuGoals = CreateMenuButton("GOALS");
             GoalsPage goalsPage = new GoalsPage(this, "GOALS", btnMenuGoals);
@@ -77,7 +76,7 @@ namespace Major_Project___Productivity_App___Hector_F
             quan.ShowQuan();
 
             // Store all the pages in an array
-            pages = new Page[] { homePage, habitsPage, tasksPage, focusPage, goalsPage, quan };
+            pages = new Page[] { homePage, habitsPage, progressPage, goalsPage, quan };
 
             // When the app opens, the default page is the home page
             SwitchToPage(pages[0]);
@@ -97,6 +96,8 @@ namespace Major_Project___Productivity_App___Hector_F
             // Enable the desired page, making it active
             page.pagePanel.Visible = true;
             activePage = page;
+
+            page.OnPageActivated();
         }
 
         /// <summary>

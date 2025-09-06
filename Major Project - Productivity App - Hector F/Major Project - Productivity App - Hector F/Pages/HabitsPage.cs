@@ -259,38 +259,56 @@ namespace Major_Project___Productivity_App___Hector_F
             pagePanel.Controls.Add(lblEnterHabitName);
         }
 
-        private void AddNewDay()
-        {
-            habitsGrid.RowCount++;
 
-            /*for (int x = 0; x < habitsGrid.ColumnCount; x++)
+        public bool[,] GetHabitData()
+        {
+            // Save habits grid checkbox layout in a 2D array of bools representing: true = checkbox ticked, false = not ticked
+            bool[,] habitData = new bool[habitsGrid.RowCount - 2, habitsGrid.ColumnCount - 2];
+
+            for (int y = 2; y < habitsGrid.RowCount; y++)
             {
-                CreateCheckbox(x, 1);
-            } */
+                for (int x = 1; x < habitsGrid.ColumnCount - 1; x++)
+                {
+                    CheckBox checkbox = habitsGrid.GetControlFromPosition(x, y) as CheckBox;
+
+                    if (checkbox != null)
+                    {
+                        habitData[y - 2, x - 1] = checkbox.Checked;
+                    }
+                }
+            }
+
+            return habitData;
         }
+
+
         private void AddNewHabit(string habitName)
         {
-            // Add new column for habit
-            habitsGrid.ColumnCount += 1;
+            // Always keep the last column reserved for the "Add Habit" button
+            int newColIndex = habitsGrid.ColumnCount - 1;
 
-            // Move the add button to this last, newly added column, leaving a column for the new habit
+            // Increase column count by 1 for the new habit
+            habitsGrid.ColumnCount++;
+
+            // Move the "Add Habit" button to the new last column
             habitsGrid.Controls.Remove(btnAddHabit);
-            habitsGrid.Controls.Add(btnAddHabit, habitsGrid.ColumnCount, 0);
+            habitsGrid.Controls.Add(btnAddHabit, habitsGrid.ColumnCount - 1, 0);
 
-            // Create the new habit header at row 0 of the missing, new column
+            // Create the new habit header label
             Label newHabit = new Label();
             newHabit.Text = habitName;
             newHabit.ForeColor = Color.White;
             newHabit.AutoSize = true;
-            habitsGrid.Controls.Add(newHabit, habitsGrid.ColumnCount - 1, 0);
+            newHabit.TextAlign = ContentAlignment.MiddleCenter;
+            habitsGrid.Controls.Add(newHabit, newColIndex, 0);
 
-            // Create new button for deletion of new habit
-            CreateDeleteButton(habitsGrid.ColumnCount - 1, 1);
+            // Create the delete button under the header
+            CreateDeleteButton(newColIndex, 1);
 
-            // Create the column of checkboxes for this next habit
+            // Create checkboxes for this new habit in every day row
             for (int y = 2; y < habitsGrid.RowCount; y++)
             {
-                CreateCheckbox(habitsGrid.ColumnCount - 1, y, false);
+                CreateCheckbox(newColIndex, y, false);
             }
         }
 
@@ -342,21 +360,7 @@ namespace Major_Project___Productivity_App___Hector_F
 
         private void SaveHabitData()
         {
-            // Save habits grid checkbox layout in a 2D array of bools representing: true = checkbox ticked, false = not ticked
-            bool[,] checkboxGridState = new bool[habitsGrid.RowCount - 2, habitsGrid.ColumnCount - 2];
-
-            for (int y = 0; y < checkboxGridState.GetLength(0); y++)
-            {
-                for (int x = 0; x < checkboxGridState.GetLength(1); x++)
-                { 
-                    CheckBox checkbox = habitsGrid.GetControlFromPosition(x + 1, y + 2) as CheckBox;
-
-                    if (checkbox != null)
-                    {
-                        checkboxGridState[y, x] = checkbox.Checked;
-                    }
-                }
-            }
+            bool[,] habitData = GetHabitData();
 
             string habitNameLine = "";
 
@@ -383,22 +387,22 @@ namespace Major_Project___Productivity_App___Hector_F
                 writer.WriteLine(habitNameLine);
 
                 // Loop through checkboxGridState 2D bool array
-                for (int y = 0; y < checkboxGridState.GetLength(0); y++)
+                for (int y = 0; y < habitData.GetLength(0); y++)
                 {
-                    for (int x = 0; x < checkboxGridState.GetLength(1); x++)
+                    for (int x = 0; x < habitData.GetLength(1); x++)
                     {
                         // Separate the states by a space, unless it is the last column (don't add a space after)
-                        if (x == checkboxGridState.GetLength(1) - 1)
+                        if (x == habitData.GetLength(1) - 1)
                         {
-                            writer.Write(checkboxGridState[y, x]);
+                            writer.Write(habitData[y, x]);
                         }
                         else
                         {
-                            writer.Write(checkboxGridState[y, x] + " ");
+                            writer.Write(habitData[y, x] + " ");
                         }
                     }
 
-                    if (y != checkboxGridState.GetLength(0) - 1 && checkboxGridState.GetLength(1) != 0)
+                    if (y != habitData.GetLength(0) - 1 && habitData.GetLength(1) != 0)
                     {
                         // Add a new line
                         writer.Write("\n");

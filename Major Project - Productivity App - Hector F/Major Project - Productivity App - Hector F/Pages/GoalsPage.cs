@@ -5,6 +5,7 @@ namespace Major_Project___Productivity_App___Hector_F
     {
         string goalsFilePath = "C:\\Progamming Projects\\School\\Major Project\\major-project\\Major Project - Productivity App - Hector F\\Major Project - Productivity App - Hector F\\bin\\Debug\\Goals.txt";
 
+        TextBox txtbxWeeklyGoals;
         TextBox txtbxMonthlyGoals;
         TextBox txtbxYearlyGoals;
 
@@ -22,9 +23,25 @@ namespace Major_Project___Productivity_App___Hector_F
         private void CreateGoalsPage()
         {
             // Create the label for the monthly goals textbox
+            Label lblWeeklyGoals = new Label();
+            lblWeeklyGoals.Text = "Weekly Goals";
+            lblWeeklyGoals.Location = new Point(50, 50);
+            lblWeeklyGoals.AutoSize = true;
+            lblWeeklyGoals.ForeColor = Color.White;
+            lblWeeklyGoals.TextAlign = ContentAlignment.MiddleCenter;
+            pagePanel.Controls.Add(lblWeeklyGoals);
+
+            // Create the textbox for the monthly goals
+            txtbxWeeklyGoals = new TextBox();
+            txtbxWeeklyGoals.Size = new Size(300, 500);
+            txtbxWeeklyGoals.Location = new Point(50, 100);
+            txtbxWeeklyGoals.Multiline = true;
+            pagePanel.Controls.Add(txtbxWeeklyGoals);
+
+            // Create the label for the monthly goals textbox
             Label lblMonthlyGoals = new Label();
             lblMonthlyGoals.Text = "Monthly Goals";
-            lblMonthlyGoals.Location = new Point(100, 50);
+            lblMonthlyGoals.Location = new Point(400, 50);
             lblMonthlyGoals.AutoSize = true;
             lblMonthlyGoals.ForeColor = Color.White;
             lblMonthlyGoals.TextAlign = ContentAlignment.MiddleCenter;
@@ -32,15 +49,16 @@ namespace Major_Project___Productivity_App___Hector_F
 
             // Create the textbox for the monthly goals
             txtbxMonthlyGoals = new TextBox();
-            txtbxMonthlyGoals.Size = new Size(400, 500);
-            txtbxMonthlyGoals.Location = new Point(100, 100);
+            txtbxMonthlyGoals.Size = new Size(300, 500);
+            txtbxMonthlyGoals.Location = new Point(400, 100);
             txtbxMonthlyGoals.Multiline = true;
             pagePanel.Controls.Add(txtbxMonthlyGoals);
 
             // Create the label for the yearly goals textbox
+            // Create the label for the yearly goals textbox
             Label lblYearlyGoals = new Label();
             lblYearlyGoals.Text = "Yearly Goals";
-            lblYearlyGoals.Location = new Point(600, 50);
+            lblYearlyGoals.Location = new Point(800, 50);
             lblYearlyGoals.AutoSize = true;
             lblYearlyGoals.ForeColor = Color.White;
             lblYearlyGoals.TextAlign = ContentAlignment.MiddleCenter;
@@ -48,16 +66,20 @@ namespace Major_Project___Productivity_App___Hector_F
 
             // Create the textbox for the yearly goals
             txtbxYearlyGoals = new TextBox();
-            txtbxYearlyGoals.Size = new Size(400, 500);
-            txtbxYearlyGoals.Location = new Point(600, 100);
+            txtbxYearlyGoals.Size = new Size(300, 500);
+            txtbxYearlyGoals.Location = new Point(800, 100);
             txtbxYearlyGoals.Multiline = true;
             pagePanel.Controls.Add(txtbxYearlyGoals);
 
             // Read the saved montly and yearly goals from the 'goals' file and add it to the textboxes
             string fileContent = File.ReadAllText(goalsFilePath);
-            string[] splitFileContent = fileContent.Split("\\");
-            txtbxMonthlyGoals.Text = splitFileContent[0];
-            txtbxYearlyGoals.Text = splitFileContent[1];
+            if (!string.IsNullOrWhiteSpace(fileContent))
+            {
+                string[] splitFileContent = fileContent.Split("\\");
+                txtbxWeeklyGoals.Text = splitFileContent[0];
+                txtbxMonthlyGoals.Text = splitFileContent[1];
+                txtbxYearlyGoals.Text = splitFileContent[2];
+            }
         }
 
         /// <summary>
@@ -69,7 +91,7 @@ namespace Major_Project___Productivity_App___Hector_F
             using (StreamWriter writer = new StreamWriter(goalsFilePath, false))
             {
                 // Write the contents of the two textboxes to the file, and separate them to distinguish month/year goals for reading the file
-                writer.WriteLine(txtbxMonthlyGoals.Text + "\\" + txtbxYearlyGoals.Text);
+                writer.WriteLine(txtbxWeeklyGoals.Text + "\\" + txtbxMonthlyGoals.Text + "\\" + txtbxYearlyGoals.Text);
             }
         }
 

@@ -36,5 +36,10 @@ namespace Major_Project___Productivity_App___Hector_F
             // IMPORTANT - every control in the page must be a child of the page panel, so that when the page panel is disabled, so will the controls
             txtbx.Parent = pagePanel;
         }
+
+        public virtual void OnPageActivated()
+        {
+
+        }
     }
 }
